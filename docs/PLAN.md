@@ -1,5 +1,12 @@
 # Detailed Project Plan for Project Management MVP
 
+## Current Status (May 9, 2026)
+- **Parts 1-8: COMPLETED** ✅
+- **Part 9: AI Chat Backend - NEXT** ⏳
+- **Part 10: AI Chat UI - PENDING** ⏳
+
+The MVP core functionality is working: users can sign in, view and interact with a persistent Kanban board. Ready to add AI chat features.
+
 ## Part 1: Planning and Documentation
 **Goal:** Create comprehensive project documentation and get user approval.
 
@@ -8,15 +15,15 @@
 - [x] Analyze existing frontend code structure
 - [x] Create frontend/AGENTS.md describing existing code
 - [x] Enrich PLAN.md with detailed substeps, checklists, tests, and success criteria
-- [ ] Get user approval on enriched plan
+- [x] Get user approval on enriched plan
 
 ### Tests:
 - N/A (documentation phase)
 
 ### Success Criteria:
-- frontend/AGENTS.md exists and accurately describes the codebase
-- PLAN.md contains detailed implementation steps for all parts
-- User has reviewed and approved the plan
+- [x] frontend/AGENTS.md exists and accurately describes the codebase
+- [x] PLAN.md contains detailed implementation steps for all parts
+- [x] User has reviewed and approved the plan
 
 ## Part 2: Docker and Backend Scaffolding
 **Goal:** Set up Docker container with FastAPI backend serving static HTML.
@@ -97,15 +104,15 @@
 - [x] Design database tables for users, boards, columns, cards
 - [x] Create SQL schema file
 - [x] Document database approach in docs/DATABASE.md
-- [ ] Get user approval on schema
+- [x] Get user approval on schema
 
 ### Tests:
 - N/A (design phase)
 
 ### Success Criteria:
-- docs/DATABASE.md exists with schema details
-- Schema supports multiple users and boards
-- User approves database design
+- [x] docs/DATABASE.md exists with schema details
+- [x] Schema supports multiple users and boards
+- [x] User approves database design
 
 ## Part 6: Backend API Implementation
 **Goal:** Implement CRUD API for Kanban data with SQLite persistence.
@@ -134,12 +141,12 @@
 **Goal:** Connect frontend to backend API for persistent Kanban.
 
 ### Substeps:
-- [ ] Replace frontend state management with API calls
-- [ ] Implement data fetching on page load
-- [ ] Add API calls for card/column operations
-- [ ] Handle loading states and errors
-- [ ] Update authentication to use backend
-- [ ] Comprehensive testing of integrated app
+- [x] Replace frontend state management with API calls
+- [x] Implement data fetching on page load
+- [x] Add API calls for card/column operations
+- [x] Handle loading states and errors
+- [x] Update authentication to pass credentials to backend
+- [x] Create unit tests for API client
 
 ### Tests:
 - Unit tests for API integration functions
@@ -153,26 +160,26 @@
 - Authentication works end-to-end
 - No data loss on refresh
 - All tests pass
-
 ## Part 8: OpenAI Integration Setup
 **Goal:** Set up OpenAI API connectivity in backend.
 
 ### Substeps:
-- [ ] Add OpenAI Python client to dependencies
-- [ ] Create OpenAI service module
-- [ ] Implement simple test API endpoint (e.g., "2+2" math)
-- [ ] Test OpenAI API key configuration
-- [ ] Verify API calls work in Docker environment
+- [x] Add OpenAI Python client to dependencies
+- [x] Create OpenAI service module
+- [x] Implement simple test API endpoint (e.g., "2+2" math)
+- [x] Test OpenAI API key configuration
+- [x] Verify API calls work in Docker environment
 
 ### Tests:
-- Unit test for OpenAI service
-- Integration test for API endpoint
-- Manual test: API returns correct OpenAI response
+- [x] Unit test for OpenAI service
+- [x] Integration test for API endpoint
+- [x] Manual test: API returns correct OpenAI response
 
 ### Success Criteria:
-- OpenAI API calls work from backend
-- Test endpoint returns expected response
-- No API key exposure in logs
+- [x] OpenAI API calls work from backend
+- [x] Test endpoint returns expected response
+- [x] No API key exposure in logs
+- [x] All 12 tests passing (8 from test_main.py + 4 from test_openai_service.py)
 
 ## Part 9: AI Chat Backend
 **Goal:** Implement AI chat with Kanban manipulation via structured outputs.

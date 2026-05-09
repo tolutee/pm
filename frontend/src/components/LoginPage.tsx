@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { validateCredentials } from "@/lib/auth";
 
 type LoginPageProps = {
-  onLogin: () => void;
+  onLogin: (username: string, password: string) => void;
 };
 
 export const LoginPage = ({ onLogin }: LoginPageProps) => {
@@ -17,7 +17,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
 
     if (validateCredentials(username, password)) {
       setError("");
-      onLogin();
+      onLogin(username, password);
       return;
     }
 

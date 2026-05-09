@@ -19,18 +19,43 @@ For the MVP, this will run locally (in a docker container)
 
 ## Technical Decisions
 
-- NextJS frontend
-- Python FastAPI backend, including serving the static NextJS site at /
+- NextJS frontend (v16.1.6) with static export
+- Python FastAPI backend (v0.115.6), including serving the static NextJS site at /
 - Everything packaged into a Docker container
 - Use "uv" as the package manager for python in the Docker container
-- Use OpenAI for the AI calls. An OPENAI_API_KEY  is in .env in the project root
-- Use `openai/gpt-5.turbo` as the model
+- Use OpenAI for the AI calls. An OPENAI_API_KEY is in .env in the project root
+- Use `gpt-4o` as the model (updated from gpt-5.turbo)
 - Use SQLLite local database for the database, creating a new db if it doesn't exist
 - Start and Stop server scripts for Mac, PC, Linux in scripts/
 
+## Current Implementation Status
+
+### ✅ Completed Features
+- Docker container with FastAPI backend
+- Static Next.js frontend serving
+- User authentication (hardcoded "user"/"password")
+- Persistent Kanban board with SQLite
+- Full CRUD operations for cards and columns
+- Drag-and-drop functionality
+- Comprehensive testing (unit + e2e)
+
+### 🔄 In Progress
+- OpenAI API integration setup
+
+### ⏳ Planned Features
+- AI chat sidebar for Kanban manipulation
+- Real-time board updates from AI responses
+
 ## Starting Point
 
-A working MVP of the frontend has been built and is already in frontend. This is not yet designed for the Docker setup. It's a pure frontend-only demo.
+A working MVP of the frontend has been built and integrated with the FastAPI backend. The application includes:
+- Complete Kanban board functionality
+- User authentication
+- Persistent data storage
+- Docker containerization
+- Comprehensive testing
+
+Ready for AI chat feature integration.
 
 ## Color Scheme
 

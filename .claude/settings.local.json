@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//mnt/c/Users/ayool/projects/pm/**)",
+      "Bash(python -m pytest test_chat.py test_main.py -q)"
+    ]
+  }
+}

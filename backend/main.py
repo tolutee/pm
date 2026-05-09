@@ -5,10 +5,15 @@ import sqlite3
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, Optional
+import uuid
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from openai_service import simple_math_calculation
+from chat_service import chat_with_ai
+from ai_schema import AIResponse, CardOperation
 
 DEFAULT_BOARD_DATA: Dict[str, Any] = {
     "columns": [
@@ -82,6 +87,10 @@ class Column(BaseModel):
 class BoardData(BaseModel):
     columns: list[Column]
     cards: dict[str, Card]
+
+
+class ChatRequest(BaseModel):
+    message: str
 
 
 def get_database_path(explicit_path: Optional[str] = None) -> Path:
@@ -198,6 +207,67 @@ async def require_auth(
     return get_user(conn, x_username, x_password)
 
 
+def save_chat_message(conn: sqlite3.Connection, user_id: int, role: str, message: str) -> None:
+    conn.execute(
+        "INSERT INTO chat_history (user_id, role, message) VALUES (?, ?, ?)",
+        (user_id, role, message),
+    )
+    conn.commit()
+
+
+def load_chat_history(conn: sqlite3.Connection, user_id: int) -> list[Dict[str, str]]:
+    rows = conn.execute(
+        "SELECT role, message FROM chat_history WHERE user_id = ? ORDER BY created_at ASC",
+        (user_id,),
+    ).fetchall()
+    return [{"role": row["role"], "content": row["message"]} for row in rows]
+
+
+def apply_operations_to_board(board: Dict[str, Any], operations: list[CardOperation]) -> None:
+    """Apply AI operations to the board state."""
+    for op in operations:
+        if op.operation == "create":
+            if not op.title or not op.columnId:
+                continue
+            card_id = f"card-{uuid.uuid4().hex[:8]}"
+            board["cards"][card_id] = {
+                "id": card_id,
+                "title": op.title,
+                "details": op.details or "",
+            }
+            for col in board["columns"]:
+                if col["id"] == op.columnId:
+                    col["cardIds"].append(card_id)
+                    break
+        
+        elif op.operation == "update":
+            if op.cardId and op.cardId in board["cards"]:
+                if op.title:
+                    board["cards"][op.cardId]["title"] = op.title
+                if op.details is not None:
+                    board["cards"][op.cardId]["details"] = op.details
+        
+        elif op.operation == "move":
+            if op.cardId and op.columnId:
+                for col in board["columns"]:
+                    if op.cardId in col["cardIds"]:
+                        col["cardIds"].remove(op.cardId)
+                        break
+                for col in board["columns"]:
+                    if col["id"] == op.columnId:
+                        col["cardIds"].append(op.cardId)
+                        break
+        
+        elif op.operation == "delete":
+            if op.cardId:
+                for col in board["columns"]:
+                    if op.cardId in col["cardIds"]:
+                        col["cardIds"].remove(op.cardId)
+                        break
+                if op.cardId in board["cards"]:
+                    del board["cards"][op.cardId]
+
+
 def create_app(database_path: Optional[str] = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -211,6 +281,22 @@ def create_app(database_path: Optional[str] = None) -> FastAPI:
     @app.get("/api/test")
     async def test_api() -> Dict[str, str]:
         return {"message": "API is working!", "status": "success"}
+
+    @app.get("/api/test-openai")
+    async def test_openai(expression: str = "2+2") -> Dict[str, Any]:
+        try:
+            result = simple_math_calculation(expression)
+            return {"expression": expression, "result": result, "status": "success"}
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"OpenAI API key not configured: {str(e)}",
+            )
+        except RuntimeError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"OpenAI API error: {str(e)}",
+            )
 
     @app.get("/__health")
     async def health_check() -> Dict[str, str]:
@@ -245,9 +331,52 @@ def create_app(database_path: Optional[str] = None) -> FastAPI:
     async def get_me(user: Dict[str, Any] = Depends(require_auth)) -> Dict[str, str]:
         return {"username": user["username"]}
 
+    @app.post("/api/chat")
+    async def chat(
+        chat_req: ChatRequest,
+        request: Request,
+        user: Dict[str, Any] = Depends(require_auth),
+    ) -> Dict[str, Any]:
+        """Handle chat message from user and return AI response with board operations."""
+        conn = get_db_connection(request)
+        
+        try:
+            history = load_chat_history(conn, user["id"])
+            save_chat_message(conn, user["id"], "user", chat_req.message)
+
+            board = load_board_for_user(conn, user["id"])
+
+            ai_response = await chat_with_ai(chat_req.message, board, history)
+
+            save_chat_message(conn, user["id"], "assistant", ai_response.message)
+
+            if ai_response.operations:
+                apply_operations_to_board(board, ai_response.operations)
+                save_board_for_user(conn, user["id"], BoardData(**board))
+
+            return {
+                "message": ai_response.message,
+                "operations": [op.model_dump() for op in ai_response.operations],
+                "status": "success",
+            }
+        
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid AI response: {str(e)}",
+            )
+        except RuntimeError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"AI error: {str(e)}",
+            )
+
     static_dir = Path(__file__).parent / "static"
+    fallback_dir = Path(__file__).parent.parent / "frontend" / "out"
     if static_dir.exists():
         app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="frontend")
+    elif fallback_dir.exists():
+        app.mount("/", StaticFiles(directory=str(fallback_dir), html=True), name="frontend")
     return app
 
 

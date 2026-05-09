@@ -16,8 +16,8 @@ export const AuthGate = () => {
     setAuthenticatedState(isAuthenticated());
   }, []);
 
-  const handleLogin = () => {
-    setAuthenticated(true);
+  const handleLogin = (username: string, password: string) => {
+    setAuthenticated(username, password);
     setAuthenticatedState(true);
   };
 

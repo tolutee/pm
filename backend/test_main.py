@@ -1,4 +1,5 @@
 ﻿from pathlib import Path
+from unittest.mock import patch, MagicMock
 
 from fastapi.testclient import TestClient
 
@@ -47,6 +48,40 @@ def test_board_get_and_update_persists(tmp_path: Path):
         second_get = client.get("/api/board", headers=auth_headers)
         assert second_get.status_code == 200
         assert second_get.json() == updated_board
+
+
+def test_openai_test_endpoint_missing_key(tmp_path: Path):
+    """Test that OpenAI endpoint gracefully handles missing API key."""
+    with patch.dict("os.environ", {}, clear=True):
+        client = create_test_client(tmp_path)
+        response = client.get("/api/test-openai?expression=2%2B2")
+        assert response.status_code == 500
+        assert "OPENAI_API_KEY" in response.json()["detail"]
+
+
+@patch("main.simple_math_calculation")
+def test_openai_test_endpoint_success(mock_calc, tmp_path: Path):
+    """Test that OpenAI endpoint returns correct response on success."""
+    mock_calc.return_value = "4"
+    client = create_test_client(tmp_path)
+    
+    response = client.get("/api/test-openai?expression=2%2B2")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["expression"] == "2+2"
+    assert data["result"] == "4"
+    assert data["status"] == "success"
+
+
+@patch("main.simple_math_calculation")
+def test_openai_test_endpoint_api_error(mock_calc, tmp_path: Path):
+    """Test that OpenAI endpoint handles API errors."""
+    mock_calc.side_effect = RuntimeError("OpenAI API error: connection failed")
+    client = create_test_client(tmp_path)
+    
+    response = client.get("/api/test-openai?expression=2%2B2")
+    assert response.status_code == 500
+    assert "OpenAI API error" in response.json()["detail"]
 
 
 def test_delete_board_resets_board(tmp_path: Path):
