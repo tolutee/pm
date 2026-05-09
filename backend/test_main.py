@@ -59,7 +59,7 @@ def test_openai_test_endpoint_missing_key(tmp_path: Path):
         assert "OPENAI_API_KEY" in response.json()["detail"]
 
 
-@patch("main.simple_math_calculation")
+@patch("routes.misc.simple_math_calculation")
 def test_openai_test_endpoint_success(mock_calc, tmp_path: Path):
     """Test that OpenAI endpoint returns correct response on success."""
     mock_calc.return_value = "4"
@@ -73,7 +73,7 @@ def test_openai_test_endpoint_success(mock_calc, tmp_path: Path):
     assert data["status"] == "success"
 
 
-@patch("main.simple_math_calculation")
+@patch("routes.misc.simple_math_calculation")
 def test_openai_test_endpoint_api_error(mock_calc, tmp_path: Path):
     """Test that OpenAI endpoint handles API errors."""
     mock_calc.side_effect = RuntimeError("OpenAI API error: connection failed")

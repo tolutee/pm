@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Read(//mnt/c/Users/ayool/projects/pm/**)",
-      "Bash(python -m pytest test_chat.py test_main.py -q)"
+      "Bash(python -m pytest test_chat.py test_main.py -q)",
+      "PowerShell($envContent = Get-Content C:\\\\Users\\\\ayool\\\\projects\\\\pm\\\\.env -Raw; $envContent | Select-String \"OPENAI_API_KEY\" | ForEach-Object { $_.Line })",
+      "PowerShell($env:OPENAI_API_KEY = \\(Get-Content C:\\\\Users\\\\ayool\\\\projects\\\\pm\\\\.env | Where-Object { $_ -match \"^OPENAI_API_KEY=\" } | ForEach-Object { $_ -replace \"^OPENAI_API_KEY=\", \"\" }\\); Set-Location C:\\\\Users\\\\ayool\\\\projects\\\\pm\\\\backend; Start-Process powershell -ArgumentList \"-NoExit\", \"-Command\", \"`$env:OPENAI_API_KEY = '$env:OPENAI_API_KEY'; Set-Location C:\\\\Users\\\\ayool\\\\projects\\\\pm\\\\backend; uvicorn main:app --reload --port 8000\" -WindowStyle Normal)",
+      "PowerShell(Start-Sleep -Seconds 3; try { $r = Invoke-WebRequest -Uri \"http://localhost:8000/__health\" -UseBasicParsing -TimeoutSec 5; \"Status: $\\($r.StatusCode\\)\" } catch { \"Not ready: $_\" })",
+      "PowerShell(Start-Process \"http://localhost:8000\")"
     ]
   }
 }

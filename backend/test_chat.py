@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 from main import create_app
 from ai_schema import AIResponse, CardOperation
+from board_service import apply_operations_to_board
 
 auth_headers = {"X-Username": "user", "X-Password": "password"}
 
@@ -14,7 +15,7 @@ def create_test_client(tmp_path: Path) -> TestClient:
     return TestClient(create_app(str(tmp_path / "test.db")))
 
 
-@patch("main.chat_with_ai")
+@patch("routes.chat.chat_with_ai")
 def test_chat_endpoint_success(mock_chat, tmp_path: Path):
     """Test successful chat endpoint."""
     # Mock AI response
@@ -46,7 +47,7 @@ def test_chat_endpoint_success(mock_chat, tmp_path: Path):
     assert data["operations"][0]["operation"] == "create"
 
 
-@patch("main.chat_with_ai")
+@patch("routes.chat.chat_with_ai")
 def test_chat_endpoint_moves_card(mock_chat, tmp_path: Path):
     """Test chat endpoint moving a card."""
     ai_response = AIResponse(
@@ -73,7 +74,7 @@ def test_chat_endpoint_moves_card(mock_chat, tmp_path: Path):
     assert data["operations"][0]["operation"] == "move"
 
 
-@patch("main.chat_with_ai")
+@patch("routes.chat.chat_with_ai")
 def test_chat_endpoint_requires_auth(mock_chat, tmp_path: Path):
     """Test that chat endpoint requires authentication."""
     client = create_test_client(tmp_path)
@@ -85,7 +86,7 @@ def test_chat_endpoint_requires_auth(mock_chat, tmp_path: Path):
     assert response.status_code == 422
 
 
-@patch("main.chat_with_ai")
+@patch("routes.chat.chat_with_ai")
 def test_chat_endpoint_handles_invalid_response(mock_chat, tmp_path: Path):
     """Test that chat endpoint handles invalid AI response."""
     mock_chat.side_effect = ValueError("Invalid JSON")
@@ -103,8 +104,6 @@ def test_chat_endpoint_handles_invalid_response(mock_chat, tmp_path: Path):
 
 def test_apply_operations_create_card():
     """Test creating a card operation."""
-    from main import apply_operations_to_board
-    
     board = {
         "columns": [{"id": "col-backlog", "title": "Backlog", "cardIds": []}],
         "cards": {}
@@ -127,8 +126,6 @@ def test_apply_operations_create_card():
 
 def test_apply_operations_move_card():
     """Test moving a card operation."""
-    from main import apply_operations_to_board
-    
     board = {
         "columns": [
             {"id": "col-backlog", "title": "Backlog", "cardIds": ["card-1"]},
@@ -151,8 +148,6 @@ def test_apply_operations_move_card():
 
 def test_apply_operations_delete_card():
     """Test deleting a card operation."""
-    from main import apply_operations_to_board
-    
     board = {
         "columns": [
             {"id": "col-backlog", "title": "Backlog", "cardIds": ["card-1"]}

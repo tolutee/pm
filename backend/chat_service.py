@@ -1,4 +1,5 @@
 import json
+import sqlite3
 from typing import Any, Dict, List, Optional
 
 from openai_service import get_openai_client
@@ -86,3 +87,19 @@ async def chat_with_ai(
         raise
     except Exception as e:
         raise RuntimeError(f"AI chat error: {str(e)}")
+
+
+def save_chat_message(conn: sqlite3.Connection, user_id: int, role: str, message: str) -> None:
+    conn.execute(
+        "INSERT INTO chat_history (user_id, role, message) VALUES (?, ?, ?)",
+        (user_id, role, message),
+    )
+    conn.commit()
+
+
+def load_chat_history(conn: sqlite3.Connection, user_id: int) -> List[Dict[str, str]]:
+    rows = conn.execute(
+        "SELECT role, message FROM chat_history WHERE user_id = ? ORDER BY created_at ASC",
+        (user_id,),
+    ).fetchall()
+    return [{"role": row["role"], "content": row["message"]} for row in rows]
