@@ -1,0 +1,246 @@
+﻿..FFF                                                                    [100%]
+================================== FAILURES ===================================
+_____________________ test_board_get_and_update_persists ______________________
+
+tmp_path = WindowsPath('C:/Users/ayool/AppData/Local/Temp/pytest-of-ayool/pytest-2/test_board_get_and_update_pers0')
+
+    def test_board_get_and_update_persists(tmp_path: Path):
+        client = create_test_client(tmp_path)
+    
+>       get_response = client.get("/api/board", headers=auth_headers)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+test_main.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:473: in get
+    return super().get(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1053: in get
+    return self.request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:450: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:395: in __get_result
+    raise self._exception
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:457: in app
+    solved_result = await solve_dependencies(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\dependencies\utils.py:678: in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+main.py:186: in require_auth
+    return get_user(conn, x_username, x_password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+conn = <sqlite3.Connection object at 0x0000020734FCE6B0>, username = 'user'
+password = 'password'
+
+    def get_user(conn: sqlite3.Connection, username: str, password: str) -> Dict[str, Any]:
+        password_hash = hash_password(password)
+>       row = conn.execute(
+            "SELECT id, password_hash FROM users WHERE username = ?",
+            (username,),
+        ).fetchone()
+E       sqlite3.OperationalError: no such table: users
+
+main.py:119: OperationalError
+_______________________ test_delete_board_resets_board ________________________
+
+tmp_path = WindowsPath('C:/Users/ayool/AppData/Local/Temp/pytest-of-ayool/pytest-2/test_delete_board_resets_board0')
+
+    def test_delete_board_resets_board(tmp_path: Path):
+        client = create_test_client(tmp_path)
+>       client.get("/api/board", headers=auth_headers)
+
+test_main.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:473: in get
+    return super().get(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1053: in get
+    return self.request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:450: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:395: in __get_result
+    raise self._exception
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:457: in app
+    solved_result = await solve_dependencies(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\dependencies\utils.py:678: in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+main.py:186: in require_auth
+    return get_user(conn, x_username, x_password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+conn = <sqlite3.Connection object at 0x0000020735A7CD60>, username = 'user'
+password = 'password'
+
+    def get_user(conn: sqlite3.Connection, username: str, password: str) -> Dict[str, Any]:
+        password_hash = hash_password(password)
+>       row = conn.execute(
+            "SELECT id, password_hash FROM users WHERE username = ?",
+            (username,),
+        ).fetchone()
+E       sqlite3.OperationalError: no such table: users
+
+main.py:119: OperationalError
+________________________ test_database_file_is_created ________________________
+
+tmp_path = WindowsPath('C:/Users/ayool/AppData/Local/Temp/pytest-of-ayool/pytest-2/test_database_file_is_created0')
+
+    def test_database_file_is_created(tmp_path: Path):
+        db_path = tmp_path / "test.db"
+        create_test_client(tmp_path)
+>       assert db_path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = WindowsPath('C:/Users/ayool/AppData/Local/Temp/pytest-of-ayool/pytest-2/test_database_file_is_created0/test.db').exists
+
+test_main.py:70: AssertionError
+============================== warnings summary ===============================
+main.py:194
+test_main.py::test_api_test_endpoint
+test_main.py::test_board_requires_valid_credentials
+test_main.py::test_board_get_and_update_persists
+test_main.py::test_delete_board_resets_board
+test_main.py::test_database_file_is_created
+  C:\Users\ayool\projects\pm\backend\main.py:194: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4598
+test_main.py::test_api_test_endpoint
+test_main.py::test_board_requires_valid_credentials
+test_main.py::test_board_get_and_update_persists
+test_main.py::test_delete_board_resets_board
+test_main.py::test_database_file_is_created
+  C:\Users\ayool\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4598: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED test_main.py::test_board_get_and_update_persists - sqlite3.Operational...
+FAILED test_main.py::test_delete_board_resets_board - sqlite3.OperationalErro...
+FAILED test_main.py::test_database_file_is_created - AssertionError: assert F...
+3 failed, 2 passed, 12 warnings in 0.76s
