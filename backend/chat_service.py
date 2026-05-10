@@ -79,6 +79,7 @@ def chat_with_ai(
             messages=messages,
             temperature=0.7,
             max_tokens=500,
+            response_format={"type": "json_object"},
         )
 
         return parse_ai_response(response.choices[0].message.content)

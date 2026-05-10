@@ -2,10 +2,11 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI
+import sqlite3
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
-from database import get_database_path, init_db
+from database import get_database_path, ensure_schema, init_db
 from routes.board import router as board_router
 from routes.chat import router as chat_router
 from routes.misc import router as misc_router
@@ -17,12 +18,25 @@ def create_app(database_path: Optional[str] = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.database_path = resolved_path
-        init_db(app)
+        init_db(str(resolved_path))
         yield
 
     app = FastAPI(title="Project Management MVP", version="0.1.0", lifespan=lifespan)
     app.state.database_path = resolved_path
-    app.state.db_conn = None
+
+    @app.middleware("http")
+    async def db_connection_middleware(request: Request, call_next):
+        path = getattr(request.app.state, "database_path", get_database_path())
+        path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(path), check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        ensure_schema(conn)
+        request.state.db_conn = conn
+        try:
+            response = await call_next(request)
+        finally:
+            conn.close()
+        return response
 
     app.include_router(misc_router)
     app.include_router(board_router)

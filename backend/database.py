@@ -3,7 +3,7 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, Request
+from fastapi import Request
 
 
 def get_database_path(explicit_path: Optional[str] = None) -> Path:
@@ -24,25 +24,15 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
 
 
 def get_db_connection(request: Request) -> sqlite3.Connection:
-    app = request.app
-    if not hasattr(app.state, "database_path"):
-        app.state.database_path = get_database_path()
-    if not hasattr(app.state, "db_conn") or app.state.db_conn is None:
-        database_path = app.state.database_path
-        database_path.parent.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(str(database_path), check_same_thread=False)
-        conn.row_factory = sqlite3.Row
-        ensure_schema(conn)
-        app.state.db_conn = conn
-    return app.state.db_conn
+    return request.state.db_conn
 
 
-def init_db(app: FastAPI) -> None:
-    database_path = getattr(app.state, "database_path", get_database_path())
-    database_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(database_path), check_same_thread=False)
+def init_db(database_path: Optional[str] = None) -> None:
+    path = get_database_path(database_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(path), check_same_thread=False)
     conn.row_factory = sqlite3.Row
     schema_path = Path(__file__).parent / "schema.sql"
     conn.executescript(schema_path.read_text())
     conn.commit()
-    app.state.db_conn = conn
+    conn.close()

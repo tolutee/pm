@@ -37,5 +37,6 @@ async def delete_board(
 ) -> Dict[str, str]:
     conn = get_db_connection(request)
     conn.execute("DELETE FROM kanban_boards WHERE user_id = ?", (user["id"],))
+    conn.execute("DELETE FROM chat_history WHERE user_id = ?", (user["id"],))
     conn.commit()
     return {"status": "deleted"}

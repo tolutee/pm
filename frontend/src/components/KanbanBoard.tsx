@@ -14,7 +14,7 @@ import {
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
 import { ChatSidebar } from "@/components/ChatSidebar";
-import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
+import { createId, initialData, moveCard, type BoardData, type Card } from "@/lib/kanban";
 import { fetchBoard, updateBoard, type APIError } from "@/lib/api";
 
 type KanbanBoardProps = {
@@ -28,6 +28,11 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  const latestBoardRef = useRef<BoardData>(board);
+  useEffect(() => {
+    latestBoardRef.current = board;
+  }, [board]);
+
   useEffect(() => {
     const loadBoard = async () => {
       setIsLoading(true);
@@ -35,6 +40,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
       try {
         const data = await fetchBoard();
         setBoard(data);
+        setError(null);
       } catch (err) {
         const apiError = err as APIError;
         setError(apiError.message || "Failed to load board");
@@ -48,6 +54,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
 
   const persistBoard = async (newBoard: BoardData) => {
     setIsSaving(true);
+    setError(null);
     try {
       await updateBoard(newBoard);
     } catch (err) {
@@ -60,10 +67,16 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const persistBoardDebounced = (newBoard: BoardData, delay = 400) => {
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
+
+  const persistBoardDebounced = (delay = 400) => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      persistBoard(newBoard);
+      persistBoard(latestBoardRef.current);
     }, delay);
   };
 
@@ -103,7 +116,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
       ),
     };
     setBoard(newBoard);
-    persistBoardDebounced(newBoard);
+    persistBoardDebounced();
   };
 
   const handleAddCard = (columnId: string, title: string, details: string) => {
@@ -150,23 +163,6 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
       <main className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-lg text-[var(--gray-text)]">Loading board...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-red-600">Error</p>
-          <p className="mt-2 text-[var(--gray-text)]">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-lg bg-[var(--primary-blue)] px-6 py-2 text-white"
-          >
-            Retry
-          </button>
         </div>
       </main>
     );
@@ -227,6 +223,20 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
             </div>
           </header>
 
+          {error && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-sm">{error}</p>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-sm font-semibold hover:underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -238,7 +248,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
                 <KanbanColumn
                   key={column.id}
                   column={column}
-                  cards={column.cardIds.map((cardId) => board.cards[cardId])}
+                  cards={column.cardIds.map((cardId) => board.cards[cardId]).filter((card): card is Card => !!card)}
                   onRename={handleRenameColumn}
                   onAddCard={handleAddCard}
                   onDeleteCard={handleDeleteCard}
