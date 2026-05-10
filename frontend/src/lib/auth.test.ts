@@ -19,7 +19,7 @@ describe("auth utilities", () => {
 
   it("stores and reads authentication state", () => {
     expect(isAuthenticated()).toBe(false);
-    setAuthenticated(true);
+    setAuthenticated("user", "password");
     expect(isAuthenticated()).toBe(true);
     clearAuthentication();
     expect(isAuthenticated()).toBe(false);

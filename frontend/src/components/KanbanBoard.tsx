@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -58,6 +58,15 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
     }
   };
 
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const persistBoardDebounced = (newBoard: BoardData, delay = 400) => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      persistBoard(newBoard);
+    }, delay);
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -94,7 +103,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
       ),
     };
     setBoard(newBoard);
-    persistBoard(newBoard);
+    persistBoardDebounced(newBoard);
   };
 
   const handleAddCard = (columnId: string, title: string, details: string) => {

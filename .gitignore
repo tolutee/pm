@@ -173,4 +173,5 @@ cython_debug/
 .pypirc
 
 .DS_Store
+pytest-output.txt
 

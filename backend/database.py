@@ -45,4 +45,4 @@ def init_db(app: FastAPI) -> None:
     schema_path = Path(__file__).parent / "schema.sql"
     conn.executescript(schema_path.read_text())
     conn.commit()
-    conn.close()
+    app.state.db_conn = conn

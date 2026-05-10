@@ -59,7 +59,7 @@ def get_board_context(board: Dict[str, Any]) -> str:
     return "Current board:\n" + "\n".join(lines)
 
 
-async def chat_with_ai(
+def chat_with_ai(
     user_message: str,
     board: Dict[str, Any],
     history: Optional[List[Dict[str, str]]] = None,

@@ -12,13 +12,16 @@ from routes.misc import router as misc_router
 
 
 def create_app(database_path: Optional[str] = None) -> FastAPI:
+    resolved_path = get_database_path(database_path)
+
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        app.state.database_path = resolved_path
         init_db(app)
         yield
 
     app = FastAPI(title="Project Management MVP", version="0.1.0", lifespan=lifespan)
-    app.state.database_path = get_database_path(database_path)
+    app.state.database_path = resolved_path
     app.state.db_conn = None
 
     app.include_router(misc_router)

@@ -20,21 +20,24 @@ async def chat(
     conn = get_db_connection(request)
     try:
         history = load_chat_history(conn, user["id"])
-        save_chat_message(conn, user["id"], "user", chat_req.message)
 
         board = load_board_for_user(conn, user["id"])
 
-        ai_response = await chat_with_ai(chat_req.message, board, history)
+        ai_response = chat_with_ai(chat_req.message, board, history)
 
+        save_chat_message(conn, user["id"], "user", chat_req.message)
         save_chat_message(conn, user["id"], "assistant", ai_response.message)
 
         if ai_response.operations:
             apply_operations_to_board(board, ai_response.operations)
             save_board_for_user(conn, user["id"], BoardData(**board))
 
+        board_data = BoardData(**board)
+
         return {
             "message": ai_response.message,
             "operations": [op.model_dump() for op in ai_response.operations],
+            "board": board_data.model_dump(),
             "status": "success",
         }
     except ValueError as e:

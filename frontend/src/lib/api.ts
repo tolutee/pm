@@ -74,6 +74,7 @@ export type ChatOperation = {
 export type ChatResponse = {
   message: string;
   operations: ChatOperation[];
+  board?: BoardData;
   status: string;
 };
 

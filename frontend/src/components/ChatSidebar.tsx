@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { fetchBoard, sendChat } from "@/lib/api";
+import { sendChat } from "@/lib/api";
 import { type BoardData } from "@/lib/kanban";
 
 type Message = {
@@ -35,9 +35,8 @@ export const ChatSidebar = ({ onBoardUpdate }: ChatSidebarProps) => {
         ...prev,
         { role: "assistant", content: response.message },
       ]);
-      if (response.operations.length > 0) {
-        const updatedBoard = await fetchBoard();
-        onBoardUpdate(updatedBoard);
+      if (response.board) {
+        onBoardUpdate(response.board);
       }
     } catch {
       setMessages((prev) => [
